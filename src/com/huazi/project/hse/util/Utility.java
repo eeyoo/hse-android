@@ -1,9 +1,15 @@
 package com.huazi.project.hse.util;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.huazi.project.hse.db.HseDB;
 import com.huazi.project.hse.entity.Template;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class Utility {
 
@@ -30,4 +36,24 @@ public class Utility {
 		}
 	}
 	
+	public synchronized static void handleJsonArrayResponse(Context context, String response) {
+		try {
+			JSONArray array = new JSONArray(response);
+			JSONObject object = array.getJSONObject(0);
+			int id = object.getInt("id");
+			String content = object.getString("content");
+			saveShareInfo(context, id, content);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private static void saveShareInfo(Context context, int id, String content) {
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit(); //打开编辑文件开始写入数据
+		editor.putInt("id", id);
+		editor.putString("content", content);
+		editor.commit();
+	}
 }
