@@ -7,7 +7,9 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import com.huazi.project.hse.R;
 import com.huazi.project.hse.util.HttpCallbackListener;
+import com.huazi.project.hse.util.HttpUtil;
 import com.huazi.project.hse.util.KSOAPHttpUtil;
+import com.huazi.project.hse.util.Utility;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -51,7 +53,8 @@ public class SoapWebServiceActivity extends Activity implements OnClickListener 
 		switch (v.getId()) {
 		case R.id.button1:
 			//soapaction();
-			axis2soap();
+			//axis2soap();
+			httpRequest("name=World!");
 			break;
 
 		default:
@@ -77,7 +80,7 @@ public class SoapWebServiceActivity extends Activity implements OnClickListener 
 	}
 	
 	private void axis2soap() {
-		final String param = "Feilin";
+		final String param = "World!";
 		KSOAPHttpUtil.connectWebService(param, new HttpCallbackListener() {
 			
 			@Override
@@ -97,5 +100,26 @@ public class SoapWebServiceActivity extends Activity implements OnClickListener 
 		txt1.setText(result);
 	}
 	
+	private void httpRequest(String param) {
+		String address = "http://192.168.0.66:8080/hse-server/services/HelloWorld/hello?response=application/json";
+		address += "&" + param;
+		url.setText(address);
+		HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
+			
+			@Override
+			public void onFinish(String response) {
+				// TODO Auto-generated method stub
+				//result = response;
+				result = Utility.handleJsonResponse(response);
+			}
+			
+			@Override
+			public void onError(Exception e) {
+				// TODO Auto-generated method stub
+				result = "request failed.";
+			}
+		});
+		txt1.setText(result);
+	}
 	
 }

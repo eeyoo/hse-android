@@ -1,9 +1,13 @@
 package com.huazi.project.hse.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParser;
 
 public class KSOAPHttpUtil {
 
@@ -103,19 +107,27 @@ public class KSOAPHttpUtil {
 			
 			@Override
 			public void run() {
-				String url = " http://192.168.0.66:8080/axis2/services/test?wsdl";
-				String namespace = "http://service.example.com";
-				String methodname = "sayHello";
+				//String url = "http://192.168.0.66:8080/hse-server/services/HelloWorld/hello?response=application/json";
+				String url = "http://192.168.0.66:8080/hse-server/services/HelloWorld/hello";
+				String namespace = "http://impl.service.example.com";
+				String methodname = "hello";
 				SoapObject request = new SoapObject(namespace, methodname);
+				//request.addProperty("response", "application/json");
+				//request.addAttribute("response", "application/json");
 				request.addProperty("name", param);
-				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+				//request.add
+				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER10);
+				//InputStream is = new ByteArrayInputStream(request);
+				
 				envelope.setOutputSoapObject(request);
 				
 				HttpTransportSE ht = new HttpTransportSE(url);
+				ht.debug = true;
 				
 				try {
 					ht.call(null, envelope);
-					SoapObject so = (SoapObject) envelope.bodyIn;
+					//SoapObject so = (SoapObject) envelope.bodyIn;
+					SoapObject so = (SoapObject) envelope.getResponse();
 					String response = so.getProperty("return").toString();
 					//String response = so.getPropertyAsString(0).toString();
 					if (listener != null) {

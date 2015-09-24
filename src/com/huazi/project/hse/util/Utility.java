@@ -36,6 +36,19 @@ public class Utility {
 		}
 	}
 	
+	public synchronized static String handleJsonResponse(String response) {
+		String result = null;
+		try {
+			JSONObject data = new JSONObject(response);
+			JSONObject helloResp = data.getJSONObject("helloResponse");
+			result = helloResp.getString("return");		
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 	public synchronized static void handleJsonArrayResponse(Context context, String response) {
 		try {
 			JSONArray array = new JSONArray(response);
