@@ -131,23 +131,5 @@ public class RestWebServiceActivity extends Activity implements OnClickListener 
 		});
 	}
 	
-	private  void queryFromServer3() {
-		String address = KSOAPHttpUtil.endPoint;
-		requestText.setText(address);
-		KSOAPHttpUtil.getSoapInfo(new HttpCallbackListener() {
-			
-			@Override
-			public void onFinish(String response) {
-				// TODO Auto-generated method stub
-				Log.i("feilin", "response->" + response);
-			}
-			
-			@Override
-			public void onError(Exception e) {
-				// TODO Auto-generated method stub
-				Log.i("feilin", "http connect failed...");
-			}
-		});
-	}
 	
 }

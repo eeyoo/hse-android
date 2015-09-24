@@ -16,6 +16,9 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity android:name="com.huazi.project.hse.activity.RestWebServiceActivity">
+            
+        </activity>
+        <activity android:name="com.huazi.project.hse.activity.SoapWebServiceActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
