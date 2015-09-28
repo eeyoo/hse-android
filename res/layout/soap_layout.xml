@@ -5,30 +5,32 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/url_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/service_ret"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="2014"
         android:ems="10" >
 
         <requestFocus />
     </EditText>
 
-    <EditText
-        android:id="@+id/editText2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10" />
-
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/web_service"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="测试Web服务" />
+
+    <EditText
+        android:id="@+id/multiline_ret"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ems="10"
+        android:inputType="textMultiLine" />
 
 </LinearLayout>

@@ -1,9 +1,11 @@
 package com.huazi.project.hse.db;
 
 
+import java.net.InterfaceAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.huazi.project.hse.entity.InterfaceData;
 import com.huazi.project.hse.entity.Template;
 
 import android.content.ContentValues;
@@ -47,6 +49,45 @@ public class HseDB {
 		}
 		return hseDB;
 	}
+	
+	/**
+	 * 存储Interface表数据
+	 */
+	public void saveInterface(InterfaceData data) {
+		if (data != null) {
+			ContentValues values = new ContentValues();
+			values.put("code", data.getCode());
+			values.put("value", data.getValue());
+			values.put("explication", data.getExplication());
+			values.put("year", data.getYear());
+			db.insert("Interface", null, values);
+		}
+	}
+	
+	/**
+	 * 读取Interface数据
+	 */
+	public List<InterfaceData> loadInterface(String year) {
+		List<InterfaceData> list = new ArrayList<InterfaceData>();
+		Cursor cursor = db.query("Interface", null, "year = ?", 
+				new String[] {year}, null, null, null);
+		if (cursor.moveToFirst()) {
+			do {
+				InterfaceData data = new InterfaceData();
+				data.setId(cursor.getInt(cursor.getColumnIndex("id")));
+				data.setCode(cursor.getString(cursor.getColumnIndex("code")));
+				data.setValue(cursor.getString(cursor.getColumnIndex("value")));
+				data.setExplication(cursor.getString(cursor.getColumnIndex("explication")));
+				data.setYear(cursor.getString(cursor.getColumnIndex("year")));
+				list.add(data);
+			} while (cursor.moveToNext());
+		}
+		if (cursor != null) {
+			cursor.close();
+		}
+		return list;
+	}
+	
 	
 	public void saveTemplate(Template template) {
 		if (template != null) {

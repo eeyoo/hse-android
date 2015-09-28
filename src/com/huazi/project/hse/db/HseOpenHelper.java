@@ -18,10 +18,21 @@ public class HseOpenHelper extends SQLiteOpenHelper{
 				+ " id integer primary key autoincrement, "
 				+ " name text, "
 				+ " code text)";
+	
+	/**
+	 * InterfaceData表创建SQL语句
+	 */
+	public static final String CREATE_INTERFACE = "create table Interface ("
+				+ " id integer primary key autoincrement, "
+				+ " code text, "
+				+ " value text, "
+				+ " explication text, "
+				+ " year text)";
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(CREATE_TEMPLATE); //创建Template表
+		//db.execSQL(CREATE_TEMPLATE); //创建Template表
+		db.execSQL(CREATE_INTERFACE);
 	}
 
 	@Override

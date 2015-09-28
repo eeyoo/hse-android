@@ -29,6 +29,8 @@
         <activity android:name="com.huazi.project.hse.activity.RestWebServiceActivity"></activity> 
         <activity android:name="com.huazi.project.hse.activity.SoapWebServiceActivity"></activity>
         
+        <activity android:name="com.huazi.project.hse.activity.TableActivity"></activity>
+        
     </application>
 
 </manifest>

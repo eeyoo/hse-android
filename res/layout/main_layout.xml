@@ -11,4 +11,16 @@
         android:text="@string/main_risk"
         />
 
+    <Button
+        android:id="@+id/webservice_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="请求网络服务" />
+    
+    <Button
+        android:id="@+id/gridview_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="表格视图" />
+
 </LinearLayout>
