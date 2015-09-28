@@ -6,7 +6,7 @@ import com.huazi.project.hse.R;
 import com.huazi.project.hse.util.AsyncHttpUtil;
 import com.huazi.project.hse.util.HttpCallbackListener;
 import com.huazi.project.hse.util.HttpUtil;
-import com.huazi.project.hse.util.KSOAPHttpUtil;
+import com.huazi.project.hse.util.KsoapUtil;
 import com.huazi.project.hse.util.MyHttp;
 import com.huazi.project.hse.util.Utility;
 import com.loopj.android.http.AsyncHttpResponseHandler;

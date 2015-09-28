@@ -1,22 +1,17 @@
 package com.huazi.project.hse.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParser;
 
-public class KSOAPHttpUtil {
+public class KsoapUtil {
 
-	//public static final String endPoint = "http://localhost:9999/Service/TestWebService?wsdl";
-	final static String SERVICE_NS = "http://server.webservice.rpc.local.demo.g4studio.org/";
-	//http://server.webservice.rpc.local.demo.g4studio.org/
-	public final static String SERVICE_URL = "http://192.168.0.66:169/g4studio/rpc/webservice/HelloWorldService";
-	//http://localhost:169/g4studio/rpc/webservice/HelloWorldService?wsdl=HelloWorldService.wsdl
-	final static String METHOD_NAME = "sayHello";
+	public final static String SERVICE_URL = "http://192.168.0.49:8080/temp/ws/userService?wsdl";
+	final static String SERVICE_NS = "http://business.services.projects.esse.com/";
+	final static String METHOD_NAME = "checkUser";
 	
 	public static void getSoapInfo(final HttpCallbackListener listener) {
 
@@ -24,43 +19,30 @@ public class KSOAPHttpUtil {
 			
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				//命名空间
-				//String nameSpace = "http://hse.project.huazi.com/";
-				//方法名
-				//String methodName = "sayHello";
-				// EndPoint
-				//String endPoint = "http://localhost:9999/Service/TestWebService?wsdl";
-				//SaopAction
-				//String soapAction = null;
 				
-				//SoapObject soapObject = new SoapObject(nameSpace, methodName);
+				SoapObject request = new SoapObject(SERVICE_NS, METHOD_NAME);
+				//request.addProperty("text", "Lily");				
+				request.addProperty("userName", "abc");				
+				request.addProperty("userPwd", "123");				
 				
-				//envelope.bodyOut = soapObject;
-				//envelope.dotNet = false;
-				//envelope.setOutputSoapObject(soapObject);
+				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);				
+				envelope.bodyOut = request;
 				
 				HttpTransportSE ht = new HttpTransportSE(SERVICE_URL);
 				ht.debug = true;
-				
-				SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-				SoapObject request = new SoapObject(SERVICE_NS, METHOD_NAME);
-				//request.addProperty("text", "Lily");
-				envelope.bodyOut = request;
 				
 				try {
 					ht.call(null, envelope);
 					
 					//获取返回数据
-					SoapObject result = (SoapObject) envelope.bodyIn;
-					//String response = result.getProperty(0).toString();
-					String response = result.toString();
+					//SoapObject result = (SoapObject) envelope.bodyIn;
+					SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+					//result = response.toString();
 					if (listener != null) {
-						listener.onFinish(response);
+						listener.onFinish(response.toString());
 					}
 					
 				} catch (Exception e) {
-					// TODO: handle exception
 					//e.printStackTrace();
 					if (listener != null) {
 						listener.onError(e);
