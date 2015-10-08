@@ -23,7 +23,7 @@
         android:text="GET请求" />
 
     <EditText
-        android:id="@+id/response_et"
+        android:id="@+id/param_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"

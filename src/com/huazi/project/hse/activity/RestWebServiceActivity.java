@@ -1,6 +1,9 @@
 package com.huazi.project.hse.activity;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.huazi.project.hse.R;
 import com.huazi.project.hse.util.AsyncHttpUtil;
@@ -26,11 +29,15 @@ import android.widget.TextView;
  * 用于测试REST Web Service
  */
 public class RestWebServiceActivity extends Activity implements OnClickListener {
+	
+	private String address = "http://192.168.0.49:8080/getDeptByName";
 
 	private TextView requestText;
 	private TextView responseText;
 	private Button getRequestBtn;
-	private EditText responseEdit;
+	private EditText paramEdit;
+	
+	private String result;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +45,11 @@ public class RestWebServiceActivity extends Activity implements OnClickListener 
 		setContentView(R.layout.rest_layout);
 		
 		requestText = (TextView) findViewById(R.id.request_tv);
+		requestText.setText(address);
+		
 		responseText = (TextView) findViewById(R.id.response_tv);
-		responseEdit = (EditText) findViewById(R.id.response_et);
+		paramEdit = (EditText) findViewById(R.id.param_et);
+		
 		getRequestBtn = (Button) findViewById(R.id.get_btn);
 		getRequestBtn.setOnClickListener(this);
 	}
@@ -48,36 +58,53 @@ public class RestWebServiceActivity extends Activity implements OnClickListener 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.get_btn: 
-			queryFromServer();
+			queryFromServer("");
 			break;
 		}
 		
 	}
 
-	private void queryFromServer() {
-		String address = "http://192.168.149.1:8080/greeting";
-		//String address = "http://192.168.0.66:8080/greetings";
-		requestText.setText(address);
+	private void queryFromServer(String param) {
+		//String address = "http://192.168.149.1:8080/greeting";
+		//String address = "http://192.168.0.49:8080/greeting";
 		HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
 			
 			@Override
 			public void onFinish(String response) {
 				// TODO Auto-generated method stub
 				Log.i("feilin", "response -> " + response);
-				//responseText.setText(response);
-				//Utility.handleJsonArrayResponse(RestWebServiceActivity.this, response);
-				//showInfor();
-				//runOnUiThread(action);
+				showJsonData(response);
 			}
 			
 			@Override
 			public void onError(Exception e) {
 				// TODO Auto-generated method stub
 				Log.i("feilin", "http connect failed...");
-				//responseText.setText(e.toString());
 				e.printStackTrace();
 			}
 		});
+		responseText.setText(result);
+	}
+	
+	private void showJsonData(String response) {
+		try {
+			//JSONObject object = new JSONObject(response);
+			//int id = object.getInt("id");
+			//String content = object.getString("content");
+			//result = "id: " + id + "; content: " + content;
+			
+			JSONArray array = new JSONArray(response);
+			for (int i=0; i<array.length(); i++) {
+				JSONObject obj = (JSONObject) array.get(i);
+				int no = obj.getInt("id");
+				String name = obj.getString("name");
+				String loc = obj.getString("loc");
+				result = "id: " + no + "; name: " + name + "; location: " + loc;
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+			result = "json get error";
+		}
 	}
 	
 	private void showInfor() {
@@ -89,47 +116,4 @@ public class RestWebServiceActivity extends Activity implements OnClickListener 
 		sb.append("; content: "+content);
 		responseText.setText(sb);
 	}
-	
-	private void queryFromServer1() {
-		//String address = "http://192.168.0.66:8080/greeting";
-		String address = "http://192.168.0.66:9999/Service/TestWebService?wsdl";
-		requestText.setText(address);
-		AsyncHttpUtil.get(address, new AsyncHttpResponseHandler() {
-			
-			@Override
-			public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
-				// TODO Auto-generated method stub
-				String response = arg2.toString();
-				Log.i("feilin", "response-> " + response);
-				//responseText.setText(text);
-			}
-			
-			@Override
-			public void onFailure(int arg0, Header[] arg1, byte[] arg2, Throwable arg3) {
-				// TODO Auto-generated method stub
-				Log.i("feilin", "http connect failed...");
-			}
-		});
-	}
-	
-	private void queryFromServer2() {
-		String address = "http://192.168.0.66:9999/Service/TestWebService?wsdl";
-		requestText.setText(address);
-		MyHttp.httpGet(address, new HttpCallbackListener() {
-			
-			@Override
-			public void onFinish(String response) {
-				// TODO Auto-generated method stub
-				Log.i("feilin", "response->" + response);
-			}
-			
-			@Override
-			public void onError(Exception e) {
-				// TODO Auto-generated method stub
-				Log.i("feilin", "http connect failed...");
-			}
-		});
-	}
-	
-	
 }

@@ -16,6 +16,7 @@ import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -67,11 +68,20 @@ public class TableActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				// TODO Auto-generated method stub
-				
+				//AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				showDialog();
 			}
 		});
 		
 		query("2015"); //query and view data
+	}
+	
+	private void showDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Hello World");
+		//builder.create();
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 	
 	private void query(String year) {
