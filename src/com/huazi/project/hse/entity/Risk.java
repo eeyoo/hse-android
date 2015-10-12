@@ -10,22 +10,23 @@ package com.huazi.project.hse.entity;
 public class Risk {
 
 	private int id;
-	private String riskType;
-	private String profType;
-	private String department;
+	private int riskTypeId;
+	private int profTypeId;
+	private int departmentId;
 	private int rank;
 	private String content;
 	private String creater;
 	private String createDate;
 	private String fileName;
-	
-	public Risk() {}
-	
-	public Risk(String riskType, String profType, String department, int rank, String content, 
-			String creater, String createDate, String fileName) {
-		this.riskType = riskType;
-		this.profType = profType;
-		this.department = department;
+
+	public Risk() {
+	}
+
+	public Risk(int riskTypeId, int profTypeId, int departmentId, int rank, String content, String creater,
+			String createDate, String fileName) {
+		this.riskTypeId = riskTypeId;
+		this.profTypeId = profTypeId;
+		this.departmentId = departmentId;
 		this.rank = rank;
 		this.content = content;
 		this.creater = creater;
@@ -41,28 +42,28 @@ public class Risk {
 		this.id = id;
 	}
 
-	public String getRiskType() {
-		return riskType;
+	public int getRiskTypeId() {
+		return riskTypeId;
 	}
 
-	public void setRiskType(String riskType) {
-		this.riskType = riskType;
+	public void setRiskTypeId(int riskTypeId) {
+		this.riskTypeId = riskTypeId;
 	}
 
-	public String getProfType() {
-		return profType;
+	public int getProfTypeId() {
+		return profTypeId;
 	}
 
-	public void setProfType(String profType) {
-		this.profType = profType;
+	public void setProfTypeId(int profTypeId) {
+		this.profTypeId = profTypeId;
 	}
 
-	public String getDepartment() {
-		return department;
+	public int getDepartmentId() {
+		return departmentId;
 	}
 
-	public void setDepartment(String department) {
-		this.department = department;
+	public void setDepartmentId(int departmentId) {
+		this.departmentId = departmentId;
 	}
 
 	public int getRank() {
@@ -104,6 +105,5 @@ public class Risk {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	
-	
+
 }
