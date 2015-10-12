@@ -5,6 +5,8 @@ package com.huazi.project.hse.activity;
 import java.util.HashMap;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.huazi.project.hse.R;
 import com.huazi.project.hse.util.HttpCallbackListener;
@@ -27,13 +29,14 @@ public class SoapWebServiceActivity extends Activity {
 	@ViewInject(R.id.url_tv)
 	private TextView url;
 	
-	@ViewInject(R.id.service_ret)
-	private EditText response;
+	@ViewInject(R.id.method_tv)
+	private TextView method;
 	
 	@ViewInject(R.id.multiline_ret)
-	private EditText jsonResponse;
+	private EditText responseET;
 	
 	private String result;
+	private String method_name;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -42,56 +45,29 @@ public class SoapWebServiceActivity extends Activity {
 		ViewUtils.inject(this);
 		
 		url.setText(KsoapUtil.SERVICE_URL);
-		//txt1.setText((CharSequence) new MyTask().execute("Lily"));
-				
-	}
-	
-	/*@OnClick(R.id.web_service)
-	public void testWebService(View v) {
-		Log.i("feilin", "test web service");
-		soapParser();
-	}*/
-	
-	@OnClick(R.id.web_service)
-	public void webService(View v) {
-		//Log.i("feilin", "Web Service");
-		//soapParser();
-		getWebResponse();
-	}
-
-	
-	private void soapParser() {
-		KsoapUtil.getSoapInfo(new HttpCallbackListener() {
-			
-			@Override
-			public void onFinish(String response) {
-				// TODO Auto-generated method stub
-				//Log.i("feilin", response);
-				result = response;
-			}
-			
-			@Override
-			public void onError(Exception e) {
-				// TODO Auto-generated method stub
-				result = "soap get error";
-			}
-		});
-		response.setText(result);
-	}
-	
-	private void getWebResponse() {
-		final String url = "http://192.168.0.49:8080/temp/ws/planAndReport?wsdl";
-		final String methodName = "getConfirmPlanInfoJson";
-		final HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put("yearStr", response.getText().toString());
 		
-		KsoapUtil.connectWebService(params, url, methodName, new HttpCallbackListener() {
+		//method_name = "saveDeptInfo";
+		//method.setText(method_name);
+	}
+	
+	@OnClick(R.id.get_btn)
+	public void getData(View v) {
+		//method_name = "getDictEntryByType";
+		method_name = "getRiskById";
+		method.setText(method_name);
+		
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		//params.put("type", "YHFL");
+		params.put("id", 1042);
+		
+		KsoapUtil.connectWebService(params, method_name, new HttpCallbackListener() {
 			
 			@Override
 			public void onFinish(String response) {
 				// TODO Auto-generated method stub
-				result = response;
-				//jsonParser(response);
+				//result = jsonParser(response);
+				//result = getDictEntry(response);
+				result = getRiskInfo(response);
 			}
 			
 			@Override
@@ -100,36 +76,64 @@ public class SoapWebServiceActivity extends Activity {
 				result = e.toString();
 			}
 		});
+		responseET.setText(result);
+	}
+	
+	private String getDictEntry(String response) {
+		return response;
+	}
+	
+	private String getRiskInfo(String response) {
+		return response;
+	}
+	
+	@OnClick(R.id.insert_btn)
+	public void insertData(View v) {
+		method_name = "saveDeptInfo";
+		method.setText(method_name);
 		
-		jsonResponse.setText(result);
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		long id = 70;
+		params.put("id", id);
+		params.put("name", "销售部");
+		params.put("loc", "越南");
+		
+		KsoapUtil.connectWebService(params, method_name, new HttpCallbackListener() {
+			
+			@Override
+			public void onFinish(String response) {
+				// TODO Auto-generated method stub
+				result = response;
+			}
+			
+			@Override
+			public void onError(Exception e) {
+				// TODO Auto-generated method stub
+				result = e.toString();
+			}
+		});
+		responseET.setText(result);
 	}
 	
 	private String jsonParser(String response) {
-		StringBuilder sb = null;
-		
+		String res = null;
 		try {
+			//JSONObject object = new JSONObject(response);
 			JSONArray array = new JSONArray(response);
+			//JSONObject object = (JSONObject) array.get(0);
 			
-			for(int i=0;i<array.length();i++){
-				org.json.JSONObject obj = (org.json.JSONObject)array.get(i);
-				JSONArray arr = obj.getJSONArray("mainInfo");
-				
-				for(int j=0;j<arr.length();j++){
-					org.json.JSONObject obj1 = (org.json.JSONObject)arr.get(j);
-					
-					String code = obj1.getString("code");
-					String exp = obj1.getString("explication");
-					String value = obj1.getString("value");
-					sb.append("code: " + code);
-					sb.append("value: " + value);
-					sb.append("explication: " + exp);			
-				}
-	    	}
-		} catch (Exception e) {
-			// TODO: handle exception
+			for (int i=0; i<array.length(); i++) {
+				JSONObject object = (JSONObject) array.get(i);
+				long id = object.getLong("deptNo");
+				String name = object.getString("deptName");
+				String loc = object.getString("location");
+				res = "id: " + id + ", deptName: " + name + ", location: " + loc;
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return sb.toString();
+		return res;
 	}
 	
 }

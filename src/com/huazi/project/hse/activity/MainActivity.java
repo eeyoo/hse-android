@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
 	
 	@OnClick(R.id.webservice_btn)
 	public void services(View v) {
-		Intent intent = new Intent(this, RestWebServiceActivity.class);
+		Intent intent = new Intent(this, SoapWebServiceActivity.class);
 		startActivity(intent);
 	}
 	

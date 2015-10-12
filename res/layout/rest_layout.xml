@@ -10,26 +10,48 @@
         android:layout_height="wrap_content"
         android:text="TextView" />
 
-    <TextView
-        android:id="@+id/response_tv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <Button
-        android:id="@+id/get_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="GET请求" />
-
     <EditText
         android:id="@+id/param_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:ems="10" >
+        
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/rest_get_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="查询数据" />
+
+    <Button
+        android:id="@+id/rest_insert_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="插入数据" />
+
+    <Button
+        android:id="@+id/rest_update_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="更新数据" />
+
+    <Button
+        android:id="@+id/rest_delete_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="删除数据" />
+
+    <EditText
+        android:id="@+id/response_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="top"
         android:ems="10"
         android:inputType="textMultiLine" >
 
-        <requestFocus />
     </EditText>
 
 </LinearLayout>

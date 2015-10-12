@@ -28,11 +28,21 @@ public class HseOpenHelper extends SQLiteOpenHelper{
 				+ " value text, "
 				+ " explication text, "
 				+ " year text)";
+	
+	public static final String CREATE_YH_RISK = "create table Risk ("
+			+ " id integer primary key autoincrement, "
+			+ " risk_type text, "
+			+ " prof_type text, "
+			+ " area_name text, "
+			+ " rank integer, "
+			+ " creater text, "
+			+ " create_date text, "
+			+ " file_name text)";
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		//db.execSQL(CREATE_TEMPLATE); //创建Template表
 		db.execSQL(CREATE_INTERFACE);
+		db.execSQL(CREATE_YH_RISK);
 	}
 
 	@Override

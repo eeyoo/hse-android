@@ -114,32 +114,7 @@ public class TableActivity extends Activity {
 		params.put("yearStr", year);
 		
 		showProgressDialog();
-		KsoapUtil.connectWebService(params, url, methodName, new HttpCallbackListener() {
-			
-			@Override
-			public void onFinish(String response) {
-				// TODO Auto-generated method stub
-				boolean result = false;
-				result = Utility.handleJsonArrayResponse(hsedb, response, year);
-				
-				if (result) {
-					runOnUiThread(new Runnable() {
-						
-						@Override
-						public void run() {
-							closeProgressDialog();
-							query(year);
-						}
-					});
-				}
-			}
-			
-			@Override
-			public void onError(Exception e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		
 	}
 
 	/**

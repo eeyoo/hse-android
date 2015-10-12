@@ -8,28 +8,43 @@
         android:id="@+id/url_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:text="" />
 
-    <EditText
-        android:id="@+id/service_ret"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/method_tv"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2014"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
+        android:text="" />
 
     <Button
-        android:id="@+id/web_service"
+        android:id="@+id/get_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="测试Web服务" />
+        android:text="获取数据" />
+
+    <Button
+        android:id="@+id/insert_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="插入数据" />
+
+    <Button
+        android:id="@+id/update_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="更新数据" />
+
+    <Button
+        android:id="@+id/delete_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="删除数据" />
 
     <EditText
         android:id="@+id/multiline_ret"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="top"
         android:ems="10"
         android:inputType="textMultiLine" />
 
