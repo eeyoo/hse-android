@@ -14,6 +14,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class HseDB {
 
@@ -90,8 +91,10 @@ public class HseDB {
 	public void saveDictEntry(DictEntry data) {
 		if (data != null) {
 			ContentValues values = new ContentValues();
+			values.put("server_id", data.getServerId());
 			values.put("name", data.getName());
 			values.put("type", data.getType());
+			values.put("type_name", data.getTypeName());
 			db.insert("DictEntry", null, values);
 		}
 	}
@@ -127,6 +130,8 @@ public class HseDB {
 				DictEntry dictEntry = new DictEntry();
 				dictEntry.setName(cursor.getString(cursor.getColumnIndex("name")));
 				dictEntry.setType(cursor.getString(cursor.getColumnIndex("type")));
+				dictEntry.setTypeName(cursor.getString(cursor.getColumnIndex("type_name")));
+				dictEntry.setServerId(cursor.getInt(cursor.getColumnIndex("server_id")));
 				list.add(dictEntry);
 			} while (cursor.moveToNext());
 		}

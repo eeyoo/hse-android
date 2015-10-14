@@ -3,6 +3,7 @@ package com.huazi.project.hse.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.util.Log;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class HseOpenHelper extends SQLiteOpenHelper{
@@ -64,8 +65,10 @@ public class HseOpenHelper extends SQLiteOpenHelper{
 	 */
 	public static final String CREATE_GF_DICTENTRY = "create table DictEntry ("
 			+ " id integer primary key autoincrement,"
+			+ " server_id integer, "
 			+ " name text, "
-			+ " type text)";
+			+ " type text, "
+			+ " type_name text)";
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
