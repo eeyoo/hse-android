@@ -12,11 +12,11 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="装置:" 
+            android:text="隐患类型：" 
             android:paddingRight="10dp"/>
 
         <TextView
-            android:id="@+id/tvUnit"
+            android:id="@+id/risk_type_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="" />
@@ -30,11 +30,11 @@
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="区域:" 
+            android:text="专业类型：" 
             android:paddingRight="10dp"/>
 
         <TextView
-            android:id="@+id/tvArea"
+            android:id="@+id/prof_type_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="" />
@@ -48,12 +48,29 @@
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设备:" 
+            android:text="所属部门：" 
             android:paddingRight="10dp"/>
 
         <TextView
-            android:id="@+id/tvEquipment"
+            android:id="@+id/dept_tv"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="评估等级：" />
+        
+        <TextView
+            android:id="@+id/risk_rank_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="" />
     </LinearLayout>
@@ -68,23 +85,23 @@
             android:id="@+id/textView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="隐患描述:" />
+            android:text="隐患描述：" />
 
         <TextView
-            android:id="@+id/tvRisk"
+            android:id="@+id/risk_content_tv"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="" />
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/photo_imgview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="50" />
 
     <Button
-        android:id="@+id/btn_upload"
+        android:id="@+id/upload_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/upload" />

@@ -3,6 +3,9 @@
  */
 package com.huazi.project.hse.entity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * @author wfl
  *
@@ -12,7 +15,7 @@ public class Risk {
 	private int id;
 	private int riskTypeId;
 	private int profTypeId;
-	private int departmentId;
+	private Integer departmentId; //待定
 	private int rank;
 	private String content;
 	private String creater;
@@ -22,11 +25,11 @@ public class Risk {
 	public Risk() {
 	}
 
-	public Risk(int riskTypeId, int profTypeId, int departmentId, int rank, String content, String creater,
+	public Risk(int riskTypeId, int profTypeId, Integer departmentId, int rank, String content, String creater,
 			String createDate, String fileName) {
 		this.riskTypeId = riskTypeId;
 		this.profTypeId = profTypeId;
-		this.departmentId = departmentId;
+		this.setDepartmentId(departmentId);
 		this.rank = rank;
 		this.content = content;
 		this.creater = creater;
@@ -56,14 +59,6 @@ public class Risk {
 
 	public void setProfTypeId(int profTypeId) {
 		this.profTypeId = profTypeId;
-	}
-
-	public int getDepartmentId() {
-		return departmentId;
-	}
-
-	public void setDepartmentId(int departmentId) {
-		this.departmentId = departmentId;
 	}
 
 	public int getRank() {
@@ -104,6 +99,33 @@ public class Risk {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+	
+	public String toJson() {
+		JSONObject obj = new JSONObject();
+		try {
+			obj.put("riskTypeId", getRiskTypeId());
+			obj.put("profTypeId", getProfTypeId());
+			obj.put("departmentId", getDepartmentId());
+			obj.put("rank", getRank());
+			obj.put("content", getContent());
+			obj.put("createBy", getCreater());
+			obj.put("createDate", getCreateDate());
+			obj.put("fileName", getFileName());
+			
+			return obj.toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	public Integer getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(Integer departmentId) {
+		this.departmentId = departmentId;
 	}
 
 }

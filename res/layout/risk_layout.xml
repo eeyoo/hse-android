@@ -36,7 +36,6 @@
             android:id="@+id/prof_type_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:entries="@array/prof_type_array"
             android:layout_weight="1" />
 
     </LinearLayout>
@@ -74,13 +73,12 @@
             android:id="@+id/rank_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:entries="@array/rank_array"
             android:layout_weight="1" />
 
     </LinearLayout>
 
     <EditText
-        android:id="@+id/content"
+        android:id="@+id/content_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.33"

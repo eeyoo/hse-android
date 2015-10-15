@@ -1,6 +1,7 @@
 package com.huazi.project.hse.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -42,6 +43,20 @@ public class HttpUtil {
 						connection.disconnect();
 					}
 				}
+			}
+		}).start();
+	}
+	
+	//Http上传文件
+	public static void uploadFileRequest(final String address, final File file,
+			final HttpCallbackListener listener) {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				String fileName = file.getName();
+				//String fileType = 
 			}
 		}).start();
 	}

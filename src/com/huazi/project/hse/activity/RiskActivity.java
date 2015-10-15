@@ -12,8 +12,10 @@ import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
@@ -22,6 +24,8 @@ import android.R.anim;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -31,21 +35,23 @@ import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.huazi.project.hse.R;
 import com.huazi.project.hse.db.HseDB;
 import com.huazi.project.hse.entity.DictEntry;
+import com.huazi.project.hse.entity.Risk;
 import com.huazi.project.hse.util.HttpCallbackListener;
 import com.huazi.project.hse.util.KsoapUtil;
 
 @ContentView(R.layout.risk_layout)
 public class RiskActivity extends Activity {
-
-	// private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-	// private Uri fileUri;
 
 	private String photoName;
 	private String photoPath;
@@ -54,12 +60,16 @@ public class RiskActivity extends Activity {
 	private Bitmap photo;
 	private boolean isPhoto = false;
 
-	private ArrayList<String> dataList;
-	private List<DictEntry> dictEntryList;
-	private HseDB hseDB;
+	private List<String> riskdataList = new ArrayList<String>();
+	private List<String> profdataList = new ArrayList<String>();
+	private List<String> rankdataList = new ArrayList<String>();
+	private List<DictEntry> riskDictList;
+	private List<DictEntry> profDictList;
 	
-	private String method_name;
-	private String result;
+	private DictEntry riskSelected;
+	private DictEntry profSelected;
+	
+	private HseDB hseDB;
 
 	@ViewInject(R.id.risk_type_spinner)
 	private Spinner riskTypeSpinner;
@@ -72,6 +82,16 @@ public class RiskActivity extends Activity {
 
 	@ViewInject(R.id.rank_spinner)
 	private Spinner rankSpinner;
+	
+	@ViewInject(R.id.content_et)
+	private TextView content_et;
+	
+	private Risk risk; //上传隐患对象
+	
+	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+	//private Uri fileUri;
+	
+	private Bundle riskBundle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -79,90 +99,132 @@ public class RiskActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		ViewUtils.inject(this);
+		
 		hseDB = HseDB.getInstance(this);
-		// hseDB.loadDictEntry()
+		
+		//riskDataList = new ArrayList<String>();
+		//profDataList = new ArrayList<String>();
+		
+		risk = new Risk();
+		riskBundle = new Bundle();
 
-		queryData();
-		setSpinner();
-	}
-
-	private void queryData() {
-		dictEntryList = hseDB.loadDictEntryByType("YHFL");
-		if (dictEntryList.size() > 0) {
-			dataList.clear();
-			for (DictEntry dictEntry : dictEntryList) {
-				dataList.add(dictEntry.getName());
-			}
-		} else { // 获取服务器数据
-			queryFromServer();
-		}
-	}
-
-	private void queryFromServer() {
-		method_name = "getDictEntries";
-		//method_name = "getDictEntryByType";
-
-		HashMap<String, Object> params = new HashMap<String, Object>();
-		//params.put("type", "YHFL");
-
-		KsoapUtil.connectWebService(params, method_name, new HttpCallbackListener() {
-
-			@Override
-			public void onFinish(String response) {
-				result = jsonParser(response);
-				// result = getDictEntry(response);
-			}
-
-			@Override
-			public void onError(Exception e) {
-			}
-		});
-	}
-	
-	private String jsonParser(String response) {
-		try {
-			JSONArray array = new JSONArray(response);
-			for (int i=0; i < array.length(); i++) {
-				
-			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return response;
-	}
-
-	private void setSpinner() {
-		// load risk type
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("北京");
-		data.add("上海");
-		data.add("广州");
-		ArrayAdapter<CharSequence> riskAdapter = ArrayAdapter.createFromResource(this, R.array.risk_type_array,
-				android.R.layout.simple_spinner_item);
-		riskAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		riskTypeSpinner.setAdapter(riskAdapter);
-		// load prof type
-		ArrayAdapter<String> profAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data);
-		profAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		profTypeSpinner.setAdapter(profAdapter);
-
-		// load department
-
-		// load rank
+		setYHFLSpinner();
+		setZYLXSpinner();
+		setRankSpinner();		
 	}
 
 	// 获取隐患类型数据，本地数据库读取，若没有数据通过Web服务读取
+	private void setYHFLSpinner() {
+		riskDictList = hseDB.loadDictEntryByType("YHFL");
+		if (riskDictList.size() > 0) {
+			//dataList.clear();
+			for (DictEntry dictEntry : riskDictList) {
+				String name = dictEntry.getName();
+				riskdataList.add(name);
+			}
+		} else { // 获取服务器数据
+			Log.i("feilin", "DictEntry not data");
+		}
+
+		// load risk type
+		ArrayAdapter<String> riskAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+				riskdataList);
+		riskAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		riskTypeSpinner.setAdapter(riskAdapter);		
+		
+		riskTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {				
+				
+				riskSelected = riskDictList.get(position);
+				Log.i("feilin", "Select content: " + riskSelected.getName());
+				Log.i("feilin", "Risk ID: " + riskSelected.getServerId());
+				risk.setRiskTypeId(riskSelected.getServerId());
+				riskBundle.putInt("risk_type_id", riskSelected.getServerId());
+				riskBundle.putString("risk_type_name", riskSelected.getName());
+			} 
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
 
 	// 获取专业类型数据
+	private void setZYLXSpinner() {
+		profDictList = hseDB.loadDictEntryByType("ZYLX");
+		if (profDictList.size() > 0) {
+			//dataList.clear();
+			for (DictEntry dictEntry : profDictList) {
+				String name = dictEntry.getName();
+				profdataList.add(name);
+			}
+		} else { // 获取服务器数据
+			Log.i("feilin", "DictEntry not data");
+		}
+
+		// load risk type
+		ArrayAdapter<String> profAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+				profdataList);
+		profAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		profTypeSpinner.setAdapter(profAdapter);
+		
+		profTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				// TODO Auto-generated method stub
+				profSelected = profDictList.get(position);
+				Log.i("feilin", "Select content: " + profSelected.getName());
+				Log.i("feilin", "Prof ID: " + profSelected.getServerId());
+				risk.setProfTypeId(profSelected.getServerId());
+				riskBundle.putInt("prof_type_id", profSelected.getServerId());
+				riskBundle.putString("prof_type_name", profSelected.getName());
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
 
 	// 获取所属部门数据
 
 	// 获取隐患等级数据
+	private void setRankSpinner() {
+		rankdataList = new ArrayList<String>();
+		rankdataList.add("一般事故隐患");
+		rankdataList.add("重大事故隐患");
+		
+		ArrayAdapter<String> rankAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rankdataList);
+		rankAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		rankSpinner.setAdapter(rankAdapter);
+		
+		rankSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				// TODO Auto-generated method stub
+				risk.setRank(position+1);
+				riskBundle.putInt("risk_rank", position+1);
+				riskBundle.putString("risk_rank_name", rankdataList.get(position));
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
 
 	@OnClick(R.id.camera_btn)
 	public void photo(View v) {// 调用系统相机
-
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		String dirPath = Environment.getExternalStorageDirectory() + "/images/";
 		File file = new File(dirPath);
@@ -178,7 +240,7 @@ public class RiskActivity extends Activity {
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
 		intent.putExtra("return-data", true);
 
-		startActivityForResult(intent, 0);
+		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 	}
 
 	@OnClick(R.id.preview_btn)
@@ -187,12 +249,21 @@ public class RiskActivity extends Activity {
 			Toast.makeText(this, "请对隐患拍照！", Toast.LENGTH_LONG).show();
 			return;
 		}
-		Intent intent = new Intent(this, UploadActivity.class);
+		Intent intent = new Intent(this, PreviewActivity.class); //To preview
 
-		intent.putExtra("time", photoTime);
-		intent.putExtra("name", photoName);
-		intent.putExtra("path", photoPath);
-		// intent.putExtra("photo", photo); //图片已经保存至SD卡
+		//intent.putExtra("time", photoTime);
+		//intent.putExtra("name", photoName);
+		//intent.putExtra("path", photoPath);
+		String content = content_et.getText().toString();
+		risk.setCreateDate(photoTime);
+		risk.setFileName(photoName);
+		risk.setContent(content);
+		
+		riskBundle.putString("risk_content", content);
+		riskBundle.putString("risk_create_date", photoTime);
+		riskBundle.putString("risk_filename", photoName);
+		riskBundle.putString("photo_path", photoPath);
+		intent.putExtra("risk_bundle", riskBundle);
 		startActivity(intent);
 	}
 
@@ -200,21 +271,20 @@ public class RiskActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {// 保存相机拍照图片
 		// TODO Auto-generated method stub
 		// super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == Activity.RESULT_OK) {
-			isPhoto = true;
-			ContentResolver cr = this.getContentResolver();
-			try {
-				photo = BitmapFactory.decodeStream(cr.openInputStream(mUri));
-				if (photo != null) {
-					photo.recycle();
+		if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+			if (resultCode == Activity.RESULT_OK) {
+				isPhoto = true;
+				ContentResolver cr = this.getContentResolver();
+				try {
+					photo = BitmapFactory.decodeStream(cr.openInputStream(mUri));
+					if (photo != null) {
+						photo.recycle();
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
 				}
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-
 		}
-
 	}
 
 }

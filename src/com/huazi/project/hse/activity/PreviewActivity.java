@@ -26,6 +26,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.huazi.project.hse.R;
+import com.huazi.project.hse.db.HseDB;
+import com.huazi.project.hse.entity.Risk;
+import com.huazi.project.hse.entity.UploadFile;
+import com.huazi.project.hse.util.HttpCallbackListener;
+import com.huazi.project.hse.util.KsoapUtil;
+import com.huazi.project.hse.util.Utility;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -34,13 +40,16 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.callback.RequestCallBackHandler;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ContentView;
+import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.CursorJoiner.Result;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -54,60 +63,175 @@ import android.widget.Toast;
 
 /**
  * 隐患预览与上传
- * @author Administrator
+ * @author wfl
  *
  */
 
 @ContentView(R.layout.preview_layout)
 public class PreviewActivity extends Activity {
 
-	/*private Button upload;
+	private Risk risk; //上传隐患对象
 	
-	private TextView tvUnit;
-	private TextView tvArea;
-	private TextView tvEquipment;
-	private TextView tvDemo;
-	private String photoName;
-	private String photoAddress;
-	private UploadContent data;
-	private SQLiteDao dao;
+	@ViewInject(R.id.risk_type_tv)
+	private TextView riskTypeTV;
 	
-	private Context context;
-	private boolean isUpload; //
-	private boolean isFirstPreview; //
-*/	
+	@ViewInject(R.id.prof_type_tv)
+	private TextView profTypeTV;
 	
+	@ViewInject(R.id.dept_tv)
+	private TextView deptTV;
+	
+	@ViewInject(R.id.risk_rank_tv)
+	private TextView riskRankTV;
+	
+	@ViewInject(R.id.risk_content_tv)
+	private TextView contentTV;
+	
+	@ViewInject(R.id.photo_imgview)
+	private ImageView imgView;
+	
+	private HseDB db;
+	
+	private String uploadStatus;
+	private String fileName;
+	private String filePath;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		ViewUtils.inject(this);
+		db = HseDB.getInstance(this);
+		
+		ready();
 	}
 	
-	@OnClick(R.id.btn_upload)
+	private void ready() {
+		//risk = new Risk();
+		Bundle bundle = getIntent().getExtras().getBundle("risk_bundle");
+		int riskTypeId = bundle.getInt("risk_type_id");
+		String riskTypeName = bundle.getString("risk_type_name");
+		int profTypeId = bundle.getInt("prof_type_id");
+		String profTypeName = bundle.getString("prof_type_name");
+		int riskRank = bundle.getInt("risk_rank");
+		String rankName = bundle.getString("risk_rank_name");
+		String content = bundle.getString("risk_content");
+		String createDate = bundle.getString("risk_create_date");
+		fileName = bundle.getString("risk_filename");
+		String photoPath = bundle.getString("photo_path");
+		filePath = photoPath;
+		Integer departmentId = null ; // 待定部门ID
+		String creater = "";
+		
+		risk = new Risk(riskTypeId,profTypeId,departmentId,riskRank,content,creater,createDate,fileName);
+		db.saveRisk(risk);  //insert into local database
+		
+		
+		riskTypeTV.setText(riskTypeName);
+		profTypeTV.setText(profTypeName);
+		deptTV.setText("待定");
+		riskRankTV.setText(rankName);
+		contentTV.setText(content);
+		
+		Bitmap bm = BitmapFactory.decodeFile(photoPath);
+		//bm = Bitmap.createBitmap(300, 450, null);
+		//bm.setDensity(8);
+		imgView.setImageBitmap(bm);
+	}
+	
+	@OnClick(R.id.upload_btn)
 	public void upload(View v) {
-		//Toast.makeText(this, POST, Toast.LENGTH_LONG).show();
-		String url = "http://192.168.0.58:8080/hse/yh/riskRecord&test4Android.action";
-		HttpUtils http = new HttpUtils();
-		http.send(HttpMethod.GET, 
-				url, 
-				new RequestCallBack<String>() {
-
+		//上传JSON数据
+		uploadJson();
+		Log.i("feilin", "risk json ");
+		//上传图片文件
+		uploadFile();
+		Log.i("feilin", "photo json ");
+		//Toast.makeText(PreviewActivity.this, uploadStatus, Toast.LENGTH_SHORT).show();
+	}
+	
+	private void uploadJson() {
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("riskJson", risk.toJson());
+		
+		KsoapUtil.connectWebService(params, "saveRiskInfo", new HttpCallbackListener() {
+			
 			@Override
-			public void onFailure(HttpException arg0, String arg1) {
-				// TODO Auto-generated method stub
-				Toast.makeText(PreviewActivity.this, "GET failed", Toast.LENGTH_LONG).show();
-			}
-
-			@Override
-			public void onSuccess(ResponseInfo<String> arg0) {
-				// TODO Auto-generated method stub
-				Toast.makeText(PreviewActivity.this, arg0.result, Toast.LENGTH_LONG).show();
+			public void onFinish(String response) {
+				//Log.i("feilin", response);
+				uploadStatus = response;
 			}
 			
-		});						
-		
+			@Override
+			public void onError(Exception e) {
+				// TODO Auto-generated method stub
+				e.printStackTrace();
+			}
+		});
 	}
+	
+	private void uploadFile() {
+		UploadFile file = new UploadFile();
+		file.setFileName(fileName);
+		file.setFileType("JPG");
+		try {
+			String content = Utility.fileToBase64(filePath);
+			file.setContent(content);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("fileJson", file.toJson());
+		KsoapUtil.connectWebService(params, "uploadFile", new HttpCallbackListener() {
+			
+			@Override
+			public void onFinish(String response) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onError(Exception e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
+	
+	/*private class UploadTask extends AsyncTask<String, Integer, String> {
+
+		String result = null;
+		@Override
+		protected String doInBackground(String... args) {
+			
+			HashMap<String, Object> params = new HashMap<String, Object>();
+			params.put("riskJson", risk.toJson());
+			
+			KsoapUtil.connectWebService(params, "saveRiskInfo", new HttpCallbackListener() {
+				
+				@Override
+				public void onFinish(String response) {
+					result = response;
+				}
+				
+				@Override
+				public void onError(Exception e) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+			
+			return result;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			//super.onPostExecute(result);
+			Toast.makeText(PreviewActivity.this, result, Toast.LENGTH_SHORT).show();
+		}
+		
+	}*/
 
 }

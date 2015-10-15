@@ -1,20 +1,26 @@
 package com.huazi.project.hse.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.huazi.project.hse.db.HseDB;
+import com.huazi.project.hse.entity.DictEntry;
 import com.huazi.project.hse.entity.InterfaceData;
 import com.huazi.project.hse.entity.Template;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 
 public class Utility {
 
-	private static HseDB db;
+	//private static HseDB db;
 	/**
 	 * 处理服务端返回的JSON数据
 	 * @param hseDB
@@ -87,5 +93,46 @@ public class Utility {
 		editor.putInt("id", id);
 		editor.putString("content", content);
 		editor.commit();
+	}
+	
+	/**
+	 * 处理DictEntry字典返回JSON数据
+	 */
+	public synchronized static void handleDictEntryJsonResponse(Context context, HseDB db, String response) {
+		try {
+			JSONArray array = new JSONArray(response);
+			for (int i = 0; i < array.length(); i++) {
+				JSONObject obj = array.getJSONObject(i);
+				String name = obj.getString("name");
+				int id = obj.getInt("id");
+				JSONObject dictType = obj.getJSONObject("dictType");
+				String type = dictType.getString("id");
+				String typeName = dictType.getString("name");
+				DictEntry data = new DictEntry(name, type, typeName, id);
+				db.saveDictEntry(data);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+		editor.putBoolean("DictEntryLoad", true);
+		editor.commit();
+	}
+	
+	public static String fileToBase64(String path) throws IOException {
+	    byte[] bytes = fileToByteArray(path);
+	    //int size = bytes.length;
+	    return Base64.encodeToString(bytes, Base64.DEFAULT);
+	}
+	
+	private static byte[] fileToByteArray(String path) throws IOException {
+	    File imagefile = new File(path);
+	    byte[] data = new byte[(int) imagefile.length()];
+	    FileInputStream fis = new FileInputStream(imagefile);
+	    fis.read(data);
+	    fis.close();
+	    return data;
 	}
 }
