@@ -1,9 +1,11 @@
 package com.huazi.project.hse.util;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -54,9 +56,19 @@ public class HttpUtil {
 			
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				String fileName = file.getName();
-				//String fileType = 
+				HttpURLConnection conn = null;
+				try {
+					URL url = new URL(address);
+					conn = (HttpURLConnection) url.openConnection();
+					conn.setDoOutput(true);
+					conn.setChunkedStreamingMode(0);
+					
+					OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+					//writeStream(out) 
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
 			}
 		}).start();
 	}

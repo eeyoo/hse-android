@@ -29,6 +29,7 @@ import com.huazi.project.hse.R;
 import com.huazi.project.hse.db.HseDB;
 import com.huazi.project.hse.entity.Risk;
 import com.huazi.project.hse.entity.UploadFile;
+import com.huazi.project.hse.util.AsyncHttpUtil;
 import com.huazi.project.hse.util.HttpCallbackListener;
 import com.huazi.project.hse.util.KsoapUtil;
 import com.huazi.project.hse.util.Utility;
@@ -42,8 +43,11 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.CursorJoiner.Result;
@@ -69,6 +73,8 @@ import android.widget.Toast;
 
 @ContentView(R.layout.preview_layout)
 public class PreviewActivity extends Activity {
+	
+	private ProgressDialog progressDialog;
 
 	private Risk risk; //上传隐患对象
 	
@@ -92,9 +98,11 @@ public class PreviewActivity extends Activity {
 	
 	private HseDB db;
 	
-	private String uploadStatus;
+	private boolean isUpload = false;
 	private String fileName;
 	private String filePath;
+	
+	private Bitmap uploadfile;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -133,32 +141,50 @@ public class PreviewActivity extends Activity {
 		contentTV.setText(content);
 		
 		Bitmap bm = BitmapFactory.decodeFile(photoPath);
+		uploadfile = bm;
 		//bm = Bitmap.createBitmap(300, 450, null);
 		//bm.setDensity(8);
 		imgView.setImageBitmap(bm);
+		
+		
 	}
 	
 	@OnClick(R.id.upload_btn)
 	public void upload(View v) {
-		//上传JSON数据
-		uploadJson();
-		Log.i("feilin", "risk json ");
-		//上传图片文件
-		uploadFile();
-		Log.i("feilin", "photo json ");
-		//Toast.makeText(PreviewActivity.this, uploadStatus, Toast.LENGTH_SHORT).show();
+		
+		if (isUpload) {
+			Toast.makeText(this, "请勿重复上传!", Toast.LENGTH_SHORT).show();
+		} else {
+			//上传JSON数据
+			uploadJson();
+			
+			//上传图片文件
+			httpUploadFile();
+			
+			isUpload = true;
+		}		
 	}
 	
+	/**
+	 * 上传隐患数据
+	 */
 	private void uploadJson() {
 		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put("riskJson", risk.toJson());
-		
+		params.put("json", risk.toJson());
+		//显示上传对话框
+		showProgressDialog("正在上传数据...");
 		KsoapUtil.connectWebService(params, "saveRiskInfo", new HttpCallbackListener() {
 			
 			@Override
 			public void onFinish(String response) {
 				//Log.i("feilin", response);
-				uploadStatus = response;
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						// 关闭对话框
+						closeProgressDialog();
+					}
+				});
 			}
 			
 			@Override
@@ -169,69 +195,66 @@ public class PreviewActivity extends Activity {
 		});
 	}
 	
-	private void uploadFile() {
-		UploadFile file = new UploadFile();
-		file.setFileName(fileName);
-		file.setFileType("JPG");
+	/**
+	 * 上传隐患图片
+	 */
+	private void httpUploadFile() {
+		String url = "http://192.168.0.49:8080/baseFrame/upload.action";
+		File file = new File(filePath);
+		//String fileKey = "uploadFile";
+		RequestParams params = new RequestParams();
+		//params.put("uploadFile", file);
 		try {
-			String content = Utility.fileToBase64(filePath);
-			file.setContent(content);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			showProgressDialog("正在上传图片...");
+			params.put("uploadFile", file);
+			AsyncHttpUtil.upload(url, params, new AsyncHttpResponseHandler() {
+				
+				@Override
+				public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
+					String response = arg2.toString();
+					Log.i("feilin", response);
+					
+					runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							// 关闭对话框
+							closeProgressDialog();
+						}
+					});
+				}
+				
+				@Override
+				public void onFailure(int arg0, Header[] arg1, byte[] arg2, Throwable arg3) {
+					String response = arg2.toString();
+					Log.i("feilin", response);
+				}
+			});
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put("fileJson", file.toJson());
-		KsoapUtil.connectWebService(params, "uploadFile", new HttpCallbackListener() {
-			
-			@Override
-			public void onFinish(String response) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onError(Exception e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 	}
 	
-	/*private class UploadTask extends AsyncTask<String, Integer, String> {
-
-		String result = null;
-		@Override
-		protected String doInBackground(String... args) {
-			
-			HashMap<String, Object> params = new HashMap<String, Object>();
-			params.put("riskJson", risk.toJson());
-			
-			KsoapUtil.connectWebService(params, "saveRiskInfo", new HttpCallbackListener() {
-				
-				@Override
-				public void onFinish(String response) {
-					result = response;
-				}
-				
-				@Override
-				public void onError(Exception e) {
-					// TODO Auto-generated method stub
-					
-				}
-			});
-			
-			return result;
+	/**
+	 * 显示加载数据对话框
+	 */
+	private void showProgressDialog(String msg) {
+		if (progressDialog == null) {
+			progressDialog = new ProgressDialog(this);
+			progressDialog.setMessage(msg);
+			progressDialog.setCanceledOnTouchOutside(false);
 		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			// TODO Auto-generated method stub
-			//super.onPostExecute(result);
-			Toast.makeText(PreviewActivity.this, result, Toast.LENGTH_SHORT).show();
+		progressDialog.show();
+	}
+	
+	/**
+	 * 关闭进度对话框
+	 */
+	private void closeProgressDialog() {
+		if (progressDialog != null) {
+			progressDialog.dismiss();
 		}
-		
-	}*/
+	}
 
 }
