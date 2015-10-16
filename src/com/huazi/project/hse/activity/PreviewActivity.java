@@ -60,6 +60,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -100,29 +101,35 @@ public class PreviewActivity extends Activity {
 	
 	private boolean isUpload = false;
 	private String fileName;
-	private String filePath;
+	//private String filePath;
 	
-	private Bitmap uploadfile;
+	//private Bitmap uploadfile;
+	
+	private Bundle riskBundle;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		ViewUtils.inject(this);
 		db = HseDB.getInstance(this);
+		riskBundle = getIntent().getExtras().getBundle("risk_bundle");
 		
-		ready();
+		//预览
+		preview();
+		
+		//ready();
 	}
 	
-	private void ready() {
+	/*private void ready() {
 		//risk = new Risk();
-		Bundle bundle = getIntent().getExtras().getBundle("risk_bundle");
+		//Bundle bundle = getIntent().getExtras().getBundle("risk_bundle");
 		int riskTypeId = bundle.getInt("risk_type_id");
 		String riskTypeName = bundle.getString("risk_type_name");
 		int profTypeId = bundle.getInt("prof_type_id");
 		String profTypeName = bundle.getString("prof_type_name");
 		int riskRank = bundle.getInt("risk_rank");
-		String rankName = bundle.getString("risk_rank_name");
-		String content = bundle.getString("risk_content");
 		String createDate = bundle.getString("risk_create_date");
 		fileName = bundle.getString("risk_filename");
 		String photoPath = bundle.getString("photo_path");
@@ -134,26 +141,31 @@ public class PreviewActivity extends Activity {
 		db.saveRisk(risk);  //insert into local database
 		
 		
+	}*/
+	
+	private void preview() { //预览信息
+		String riskTypeName = riskBundle.getString("risk_type_name");
+		String profTypeName = riskBundle.getString("prof_type_name");
+		String departmentName = "待定";
+		String rankName = riskBundle.getString("risk_rank_name");
+		String content = riskBundle.getString("risk_content");
+		
 		riskTypeTV.setText(riskTypeName);
 		profTypeTV.setText(profTypeName);
-		deptTV.setText("待定");
+		deptTV.setText(departmentName);
 		riskRankTV.setText(rankName);
 		contentTV.setText(content);
 		
+		String photoPath = riskBundle.getString("photo_path");
 		Bitmap bm = BitmapFactory.decodeFile(photoPath);
-		uploadfile = bm;
-		//bm = Bitmap.createBitmap(300, 450, null);
-		//bm.setDensity(8);
 		imgView.setImageBitmap(bm);
-		
-		
 	}
 	
 	@OnClick(R.id.upload_btn)
 	public void upload(View v) {
 		
 		if (isUpload) {
-			Toast.makeText(this, "请勿重复上传!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "请勿重复上传！", Toast.LENGTH_SHORT).show();
 		} else {
 			//上传JSON数据
 			uploadJson();
@@ -169,6 +181,20 @@ public class PreviewActivity extends Activity {
 	 * 上传隐患数据
 	 */
 	private void uploadJson() {
+		//准备提交信息
+		risk = new Risk();
+		int riskTypeId = riskBundle.getInt("risk_type_id");
+		int profTypeId = riskBundle.getInt("prof_type_id");
+		int riskRank = riskBundle.getInt("risk_rank");
+		fileName = riskBundle.getString("risk_filename");
+		String content = riskBundle.getString("risk_content");
+		risk.setRiskTypeId(riskTypeId);
+		risk.setProfTypeId(profTypeId);
+		risk.setRank(riskRank);
+		risk.setContent(content);
+		risk.setFileName(fileName);
+		risk.setCreater("");
+		
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("json", risk.toJson());
 		//显示上传对话框
@@ -200,10 +226,10 @@ public class PreviewActivity extends Activity {
 	 */
 	private void httpUploadFile() {
 		String url = "http://192.168.0.49:8080/baseFrame/upload.action";
+		String filePath = riskBundle.getString("photo_path");
 		File file = new File(filePath);
-		//String fileKey = "uploadFile";
 		RequestParams params = new RequestParams();
-		//params.put("uploadFile", file);
+
 		try {
 			showProgressDialog("正在上传图片...");
 			params.put("uploadFile", file);
@@ -255,6 +281,15 @@ public class PreviewActivity extends Activity {
 		if (progressDialog != null) {
 			progressDialog.dismiss();
 		}
+	}
+	
+	@ViewInject(R.id.preview_back_btn)
+	private Button backBtn;
+	
+	@OnClick(R.id.preview_back_btn)
+	public void onBack(View v) {
+		super.onBackPressed();
+		backBtn.setBackgroundResource(R.drawable.back_pressed1);
 	}
 
 }

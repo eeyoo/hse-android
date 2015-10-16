@@ -39,51 +39,24 @@ public class MainActivity extends Activity {
 		ViewUtils.inject(this);
 		
 		db = HseDB.getInstance(this);
-	}
-
-	@OnClick(R.id.risk_btn)
-	public void danger(View v) {
-		// Toast.makeText(this, "OK", duration)
-		Intent intent = new Intent(this, RiskActivity.class);
-		startActivity(intent);
-	}
-
-	@OnClick(R.id.webservice_btn)
-	public void services(View v) {
-		// Intent intent = new Intent(this, SoapWebServiceActivity.class);
-		// startActivity(intent);
-		// 获取DictEntry字典数据
-		//queryFromServer("getDictEntries");
-		//Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean dictEntryLoad = preferences.getBoolean("DictEntryLoad", false);
 		
 		if (!dictEntryLoad) {
-			new LoadData().execute("getDictEntries");
-		} else {
-			Toast.makeText(this, "已经载入数据", Toast.LENGTH_SHORT).show();
-		}
-		
+			//服务端获取全局字典数据
+			queryFromServer("getDictEntries");
+		} 
 	}
-	
-	private class LoadData extends AsyncTask<String, Integer, String> {
 
-		@Override
-		protected String doInBackground(String... params) {
-			queryFromServer(params[0]);
-			return "载入数据成功";
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			// TODO Auto-generated method stub
-			//super.onPostExecute(result);
-			Toast.makeText(MainActivity.this, result, Toast.LENGTH_SHORT).show();
-		}
+	@OnClick(R.id.risk_btn)
+	public void risk(View v) {
+		//隐患上报
+		Intent intent = new Intent(this, RiskActivity.class);
+		startActivity(intent);
 	}
 
 	private void queryFromServer(String method_name) {
-		//method_name = "getDictEntries";
 		HashMap<String, Object> params = new HashMap<String, Object>();
 
 		KsoapUtil.connectWebService(params, method_name, new HttpCallbackListener() {
@@ -100,15 +73,8 @@ public class MainActivity extends Activity {
 	}
 
 
-	@OnClick(R.id.gridview_btn)
-	public void grid(View v) {
-		// Intent intent = new Intent(this, ListViewActivity.class);
-		// startActivity(intent);
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}

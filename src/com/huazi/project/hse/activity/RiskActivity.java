@@ -24,6 +24,7 @@ import android.R.anim;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -31,14 +32,19 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -84,34 +90,51 @@ public class RiskActivity extends Activity {
 	private Spinner rankSpinner;
 	
 	@ViewInject(R.id.content_et)
-	private TextView content_et;
-	
-	private Risk risk; //上传隐患对象
+	private EditText content_et;
 	
 	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-	//private Uri fileUri;
 	
 	private Bundle riskBundle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		ViewUtils.inject(this);
 		
 		hseDB = HseDB.getInstance(this);
 		
-		//riskDataList = new ArrayList<String>();
-		//profDataList = new ArrayList<String>();
-		
-		risk = new Risk();
 		riskBundle = new Bundle();
 
 		setYHFLSpinner();
 		setZYLXSpinner();
 		setRankSpinner();		
 	}
+	
+	/*private void refresh() {
+		riskDictList = hseDB.loadDictEntryByType("YHFL");
+		if (riskDictList.size() > 0) {
+			//dataList.clear();
+			for (DictEntry dictEntry : riskDictList) {
+				String name = dictEntry.getName();
+				riskdataList.add(name);
+			}
+		} else { // 获取服务器数据
+			Log.i("feilin", "DictEntry not data");
+		}
+		
+		profDictList = hseDB.loadDictEntryByType("ZYLX");
+		if (profDictList.size() > 0) {
+			//dataList.clear();
+			for (DictEntry dictEntry : profDictList) {
+				String name = dictEntry.getName();
+				profdataList.add(name);
+			}
+		} else { // 获取服务器数据
+			Log.i("feilin", "DictEntry not data");
+		}
+	}*/
 
 	// 获取隐患类型数据，本地数据库读取，若没有数据通过Web服务读取
 	private void setYHFLSpinner() {
@@ -135,14 +158,11 @@ public class RiskActivity extends Activity {
 		riskTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {				
-				
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {								
 				riskSelected = riskDictList.get(position);
-				Log.i("feilin", "Select content: " + riskSelected.getName());
-				Log.i("feilin", "Risk ID: " + riskSelected.getServerId());
-				risk.setRiskTypeId(riskSelected.getServerId());
+
 				riskBundle.putInt("risk_type_id", riskSelected.getServerId());
-				riskBundle.putString("risk_type_name", riskSelected.getName());
+				riskBundle.putString("risk_type_name", riskSelected.getName());				
 			} 
 
 			@Override
@@ -176,11 +196,8 @@ public class RiskActivity extends Activity {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				// TODO Auto-generated method stub
 				profSelected = profDictList.get(position);
-				Log.i("feilin", "Select content: " + profSelected.getName());
-				Log.i("feilin", "Prof ID: " + profSelected.getServerId());
-				risk.setProfTypeId(profSelected.getServerId());
+				
 				riskBundle.putInt("prof_type_id", profSelected.getServerId());
 				riskBundle.putString("prof_type_name", profSelected.getName());
 			}
@@ -209,8 +226,7 @@ public class RiskActivity extends Activity {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				// TODO Auto-generated method stub
-				risk.setRank(position+1);
+
 				riskBundle.putInt("risk_rank", position+1);
 				riskBundle.putString("risk_rank_name", rankdataList.get(position));
 			}
@@ -243,30 +259,6 @@ public class RiskActivity extends Activity {
 		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 	}
 
-	@OnClick(R.id.preview_btn)
-	public void preview(View v) { // 发送预览信息
-		if (!isPhoto) {
-			Toast.makeText(this, "请对隐患拍照！", Toast.LENGTH_LONG).show();
-			return;
-		}
-		Intent intent = new Intent(this, PreviewActivity.class); //To preview
-
-		//intent.putExtra("time", photoTime);
-		//intent.putExtra("name", photoName);
-		//intent.putExtra("path", photoPath);
-		String content = content_et.getText().toString();
-		risk.setCreateDate(photoTime);
-		risk.setFileName(photoName);
-		risk.setContent(content);
-		
-		riskBundle.putString("risk_content", content);
-		riskBundle.putString("risk_create_date", photoTime);
-		riskBundle.putString("risk_filename", photoName);
-		riskBundle.putString("photo_path", photoPath);
-		intent.putExtra("risk_bundle", riskBundle);
-		startActivity(intent);
-	}
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {// 保存相机拍照图片
 		// TODO Auto-generated method stub
@@ -286,5 +278,30 @@ public class RiskActivity extends Activity {
 			}
 		}
 	}
+	
+	@OnClick(R.id.preview_btn)
+	public void preview(View v) { // 发送预览信息
+		if (!isPhoto) {
+			Toast.makeText(this, "请对隐患拍照！", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		Intent intent = new Intent(this, PreviewActivity.class); //To preview
+		String content = content_et.getText().toString();
+		
+		riskBundle.putString("risk_content", content);
+		riskBundle.putString("risk_create_date", photoTime);
+		riskBundle.putString("risk_filename", photoName);
+		riskBundle.putString("photo_path", photoPath);
+		intent.putExtra("risk_bundle", riskBundle);
+		startActivity(intent);
+	}
 
+	@ViewInject(R.id.risk_back_btn)
+	private Button backBtn;
+	
+	@OnClick(R.id.risk_back_btn)
+	public void onBack(View v) {
+		super.onBackPressed();
+		backBtn.setBackgroundResource(R.drawable.back_pressed1);
+	}
 }

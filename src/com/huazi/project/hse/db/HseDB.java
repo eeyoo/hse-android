@@ -90,11 +90,11 @@ public class HseDB {
 	 */
 	public void saveDictEntry(DictEntry data) {
 		if (data != null) {
-			ContentValues values = new ContentValues();
-			values.put("server_id", data.getServerId());
+			ContentValues values = new ContentValues();			
 			values.put("name", data.getName());
 			values.put("type", data.getType());
 			values.put("type_name", data.getTypeName());
+			values.put("server_id", data.getServerId());
 			db.insert("DictEntry", null, values);
 		}
 	}
@@ -124,7 +124,7 @@ public class HseDB {
 	 */
 	public List<DictEntry> loadDictEntryByType(String type) {
 		List<DictEntry> list = new ArrayList<DictEntry>();
-		Cursor cursor = db.query("DictEntry", null, "type = ?", new String[] {type}, null, null, null);
+		Cursor cursor = db.query("DictEntry", null, "type = ?", new String[] {type}, null, null, "id desc");
 		if (cursor.moveToFirst()) {
 			do {
 				DictEntry dictEntry = new DictEntry();

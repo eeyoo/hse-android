@@ -106,11 +106,11 @@ public class Risk {
 		try {
 			obj.put("riskTypeId", getRiskTypeId());
 			obj.put("profTypeId", getProfTypeId());
-			obj.put("departmentId", getDepartmentId());
+			//obj.put("departmentId", getDepartmentId());
 			obj.put("rank", getRank());
 			obj.put("content", getContent());
 			obj.put("createBy", getCreater());
-			obj.put("createDate", getCreateDate());
+			//obj.put("createDate", getCreateDate());
 			obj.put("fileName", getFileName());
 			
 			return obj.toString();

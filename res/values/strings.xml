@@ -1,7 +1,9 @@
 <resources>
 
     <string name="action_settings">Settings</string>
-    <string name="app_name">hse-android</string>
+    <string name="app_name">HSE系统管理</string>
+    <string name="preview_name">隐患预览</string>
+    <string name="risk_name">隐患上报</string>
        
     <string name="main_risk">隐患上报</string>
     <string name="upload_json">上传数据</string>
@@ -9,30 +11,10 @@
     <string name="photo">拍照</string>
     <string name="preview">预览</string>
     <string name="upload">上传</string>
-    <string name="content_tip">请输入隐患内容！</string>
-    
-    <string-array name="risk_type_array">
-        <item >人员行为</item>
-        <item >设备设施缺陷</item>
-        <item >防护缺陷</item>
-        <item >电伤害</item>
-    </string-array>
-    
-    <string-array name="prof_type_array">
-        <item >电气</item>
-        <item >仪表</item>
-        <item >设备</item>
-        <item >HSE</item>
-    </string-array>
-    
+    <string name="content_tip">请输入隐患内容...</string>
+
     <string-array name="department_array">
         <item >待定</item>
-        <item >HSE部门</item>
-    </string-array>
-    
-    <string-array name="rank_array">
-        <item >一般事故隐患</item>
-        <item >重大事故隐患</item>
     </string-array>
 
 </resources>
