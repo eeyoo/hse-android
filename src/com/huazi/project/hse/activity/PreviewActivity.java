@@ -94,7 +94,7 @@ public class PreviewActivity extends Activity {
 	@ViewInject(R.id.risk_content_tv)
 	private TextView contentTV;
 	
-	@ViewInject(R.id.photo_imgview)
+	@ViewInject(R.id.preview_img)
 	private ImageView imgView;
 	
 	private HseDB db;
@@ -161,7 +161,7 @@ public class PreviewActivity extends Activity {
 		imgView.setImageBitmap(bm);
 	}
 	
-	@OnClick(R.id.upload_btn)
+	@OnClick(R.id.preview_upload_btn)
 	public void upload(View v) {
 		
 		if (isUpload) {
@@ -176,6 +176,22 @@ public class PreviewActivity extends Activity {
 			isUpload = true;
 		}		
 	}
+	
+	/*@OnClick(R.id.upload_btn)
+	public void upload(View v) {
+		
+		if (isUpload) {
+			Toast.makeText(this, "请勿重复上传！", Toast.LENGTH_SHORT).show();
+		} else {
+			//上传JSON数据
+			uploadJson();
+			
+			//上传图片文件
+			httpUploadFile();
+			
+			isUpload = true;
+		}		
+	}*/
 	
 	/**
 	 * 上传隐患数据
@@ -289,7 +305,7 @@ public class PreviewActivity extends Activity {
 	@OnClick(R.id.preview_back_btn)
 	public void onBack(View v) {
 		super.onBackPressed();
-		backBtn.setBackgroundResource(R.drawable.back_pressed1);
+		//backBtn.setBackgroundResource(R.drawable.back_pressed1);
 	}
 
 }

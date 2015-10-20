@@ -7,14 +7,14 @@
     <RelativeLayout 
         android:layout_width="match_parent"
         android:layout_height="43dp"
-        android:background="#3e85b4"> 
+        android:background="#f44336"> 
         <Button 
             android:id="@+id/risk_back_btn"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/back_normal"/>
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/back"/>
         
         <TextView 
             android:id="@+id/title_tv"

@@ -302,6 +302,6 @@ public class RiskActivity extends Activity {
 	@OnClick(R.id.risk_back_btn)
 	public void onBack(View v) {
 		super.onBackPressed();
-		backBtn.setBackgroundResource(R.drawable.back_pressed1);
+		//backBtn.setBackgroundResource(R.drawable.back_pressed1);
 	}
 }
