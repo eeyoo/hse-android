@@ -135,4 +135,10 @@ public class Utility {
 	    fis.close();
 	    return data;
 	}
+	
+	public synchronized static void handleUserLoginResponse(Context context, boolean status) {
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+		editor.putBoolean("login", status);
+		editor.commit();
+	}
 }

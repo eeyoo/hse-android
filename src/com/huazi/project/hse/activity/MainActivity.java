@@ -14,6 +14,7 @@ import com.huazi.project.hse.util.KsoapUtil;
 import com.huazi.project.hse.util.Utility;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ContentView;
+import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 
 import android.os.AsyncTask;
@@ -24,20 +25,32 @@ import android.util.Log;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences.Editor;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.Toast;
 
 @ContentView(R.layout.main_layout)
 public class MainActivity extends Activity {
 
 	private HseDB db;
+	
+	//@ViewInject(R.id.username)
+	private EditText userEt;
+	
+	//@ViewInject(R.id.password)
+	private EditText passwordEt;
+	
+	private String userName;
+	private String password;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,15 +97,26 @@ public class MainActivity extends Activity {
 	public void userManager(View v) {
 		//Dialog dialog = new Dialog(this);
 		//dialog.show();
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		
+		
+		/*AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = this.getLayoutInflater();
+		View view = inflater.inflate(R.layout.dialog_layout, null);
+		
+		userEt = (EditText) view.findViewById(R.id.username);
+		passwordEt = (EditText) view.findViewById(R.id.password);
+		
+		userName = userEt.getText().toString();
+		password = passwordEt.getText().toString();
+		
 		builder.setView(inflater.inflate(R.layout.dialog_layout, null))
 			.setPositiveButton(R.string.signin, new OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					// TODO Auto-generated method stub
-					
+					Log.i("feilin", userName);
+					Log.i("feilin", password);
 				}
 			})
 			.setNegativeButton(R.string.cancel, new OnClickListener() {
@@ -103,7 +127,10 @@ public class MainActivity extends Activity {
 					
 				}
 			});
-		builder.create().show();
+		builder.create().show();*/
+		
+		Intent intent = new Intent(this, UserManageActivity.class);
+		startActivity(intent);
 	}
 
 

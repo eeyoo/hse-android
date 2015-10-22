@@ -19,12 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <activity android:name="com.huazi.project.hse.activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+        <activity android:name="com.huazi.project.hse.activity.MainActivity"></activity>
         <activity android:name="com.huazi.project.hse.activity.RiskActivity"></activity>
         <activity android:name="com.huazi.project.hse.activity.PreviewActivity"></activity>
         <activity android:name="com.huazi.project.hse.activity.UploadActivity"></activity>
@@ -34,6 +29,14 @@
         
         <activity android:name="com.huazi.project.hse.activity.TableActivity"></activity>
         <activity android:name="com.huazi.project.hse.activity.ListViewActivity"></activity>
+        
+        <activity android:name="com.huazi.project.hse.activity.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>            
+        </activity>
+        <activity android:name="com.huazi.project.hse.activity.UserManageActivity"></activity>
         
     </application>
 
