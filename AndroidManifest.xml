@@ -30,7 +30,9 @@
         <activity android:name="com.huazi.project.hse.activity.TableActivity"></activity>
         <activity android:name="com.huazi.project.hse.activity.ListViewActivity"></activity>
         
-        <activity android:name="com.huazi.project.hse.activity.LoginActivity">
+        <activity 
+            android:name="com.huazi.project.hse.activity.LoginActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

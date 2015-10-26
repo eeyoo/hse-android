@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 /**
  * @author wfl
- * 用户管理
+ * 用户首次登陆
  */
 @ContentView(R.layout.login_layout)
 public class LoginActivity extends Activity {
@@ -47,7 +47,7 @@ public class LoginActivity extends Activity {
 	private String username;
 	private String password;
 	
-	private String result;
+	private String result = null;
 	
 	//private Intent intent;
 
@@ -64,6 +64,7 @@ public class LoginActivity extends Activity {
 		if (login) {
 			Intent intent = new Intent(this, MainActivity.class);
 			startActivity(intent);
+			finish(); //kill itself
 		}
 		
 	}
@@ -86,7 +87,7 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onFinish(String response) {
 				// TODO Auto-generated method stub
-				Log.i("feilin", response);
+				//Log.i("feilin", response); 
 				result = response;
 				if (result.equals("true")) {
 					//saveLoginStatus(true);
@@ -94,9 +95,10 @@ public class LoginActivity extends Activity {
 					Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 					startActivity(intent);
 					finish(); // kill itself
-				} else {
-					//saveLoginStatus(false);
-					Log.i("feilin", "登陆失败");
+				} else if (result.equals("false")) {
+					//Log.i("feilin", result);
+					Utility.handleUserLoginResponse(LoginActivity.this, false);
+					//Toast.makeText(LoginActivity.this, "用户信息错误", Toast.LENGTH_SHORT).show();
 					usernameEt.setText("");
 					passwordEt.setText("");
 				}
@@ -112,6 +114,10 @@ public class LoginActivity extends Activity {
 		
 		//new MyTask().execute();
 		//Log.i("feilin", result);
+	}
+	
+	private void showMessage() {
+		Toast.makeText(this, "用户信息错误", Toast.LENGTH_SHORT).show();
 	}
 
 	@Override

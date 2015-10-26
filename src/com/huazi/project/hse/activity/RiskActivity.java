@@ -73,7 +73,9 @@ public class RiskActivity extends Activity {
 	private List<DictEntry> profDictList;
 	
 	private DictEntry riskSelected;
+	private int mRiskSelected;
 	private DictEntry profSelected;
+	private int mProfSelected;
 	
 	private HseDB hseDB;
 
@@ -95,11 +97,21 @@ public class RiskActivity extends Activity {
 	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 	
 	private Bundle riskBundle;
+	
+	private static final String RISK_TYPE = "risk_type";
+	private static final String PROF_TYPE = "prof_type";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		if (savedInstanceState != null) {
+			mRiskSelected = savedInstanceState.getInt(RISK_TYPE);
+			mProfSelected = savedInstanceState.getInt(PROF_TYPE);
+		} else {
+			mRiskSelected = 0;
+			mProfSelected = 0;
+		}
 		
 		ViewUtils.inject(this);
 		
@@ -112,29 +124,27 @@ public class RiskActivity extends Activity {
 		setRankSpinner();		
 	}
 	
-	/*private void refresh() {
-		riskDictList = hseDB.loadDictEntryByType("YHFL");
-		if (riskDictList.size() > 0) {
-			//dataList.clear();
-			for (DictEntry dictEntry : riskDictList) {
-				String name = dictEntry.getName();
-				riskdataList.add(name);
-			}
-		} else { // 获取服务器数据
-			Log.i("feilin", "DictEntry not data");
-		}
+	
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		savedInstanceState.putInt(RISK_TYPE, mRiskSelected);
+		savedInstanceState.putInt(PROF_TYPE, mProfSelected);
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		outState.putInt(RISK_TYPE, mRiskSelected);
+		outState.putInt(PROF_TYPE, mProfSelected);
+		super.onSaveInstanceState(outState);
 		
-		profDictList = hseDB.loadDictEntryByType("ZYLX");
-		if (profDictList.size() > 0) {
-			//dataList.clear();
-			for (DictEntry dictEntry : profDictList) {
-				String name = dictEntry.getName();
-				profdataList.add(name);
-			}
-		} else { // 获取服务器数据
-			Log.i("feilin", "DictEntry not data");
-		}
-	}*/
+	}
+
 
 	// 获取隐患类型数据，本地数据库读取，若没有数据通过Web服务读取
 	private void setYHFLSpinner() {
@@ -153,13 +163,15 @@ public class RiskActivity extends Activity {
 		ArrayAdapter<String> riskAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
 				riskdataList);
 		riskAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		riskTypeSpinner.setAdapter(riskAdapter);		
+		riskTypeSpinner.setAdapter(riskAdapter);
+		riskTypeSpinner.setSelection(mRiskSelected);
 		
 		riskTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {								
-				riskSelected = riskDictList.get(position);
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				mRiskSelected = position;
+				riskSelected = riskDictList.get(mRiskSelected);
 
 				riskBundle.putInt("risk_type_id", riskSelected.getServerId());
 				riskBundle.putString("risk_type_name", riskSelected.getName());				
@@ -191,12 +203,14 @@ public class RiskActivity extends Activity {
 				profdataList);
 		profAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		profTypeSpinner.setAdapter(profAdapter);
+		profTypeSpinner.setSelection(mProfSelected);
 		
 		profTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				profSelected = profDictList.get(position);
+				mProfSelected = position;
+				profSelected = profDictList.get(mProfSelected);
 				
 				riskBundle.putInt("prof_type_id", profSelected.getServerId());
 				riskBundle.putString("prof_type_name", profSelected.getName());

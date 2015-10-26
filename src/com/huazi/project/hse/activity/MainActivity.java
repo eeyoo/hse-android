@@ -62,10 +62,9 @@ public class MainActivity extends Activity {
 		db = HseDB.getInstance(this);
 		
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean dictEntryLoad = preferences.getBoolean("DictEntryLoad", false);
-		
+		boolean dictEntryLoad = preferences.getBoolean("DictEntryLoad", false);		
 		if (!dictEntryLoad) {
-			//服务端获取全局字典数据
+			//服务端获取全局字典数据-仅执行一次
 			queryFromServer("getDictEntries");
 		} 
 	}
